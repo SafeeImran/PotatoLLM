@@ -46,6 +46,11 @@ logs/
 # Local presentation / manim working folder, not part of the repo
 presentation/
 
+# Local screen recordings and other large media, not part of the repo
+tutorial/
+*.mp4
+*.mov
+
 # Editors / OS
 .vscode/
 .idea/
