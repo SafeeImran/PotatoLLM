@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lorenz Attractor — ASCII Chaos</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    overflow: hidden;
+    height: 100%;
+  }
+  #wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  #header {
+    color: #5eff8f;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 6px;
+    text-align: center;
+    text-shadow: 0 0 4px rgba(94,255,143,0.5);
+  }
+  #header .dim { color: #3a9c5a; }
+  #header .amber { color: #ffb84d; }
+  canvas {
+    background: #000;
+    display: block;
+  }
+  #footer {
+    color: #2f6e45;
+    font-size: 11px;
+    margin-top: 6px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="header">
+    LORENZ ATTRACTOR &nbsp;·&nbsp; <span class="dim">σ=10  ρ=28  β=8/3</span><br>
+    <span class="dim">dx/dt = σ(y−x)</span> &nbsp; <span class="dim">dy/dt = x(ρ−z)−y</span> &nbsp; <span class="dim">dz/dt = xy−βz</span><br>
+    <span id="delta">two trajectories, Δ₀ = 1e-5 apart &nbsp;·&nbsp; <span class="amber">amber</span> vs <span style="color:#5eff8f">green</span></span>
+  </div>
+  <canvas id="c"></canvas>
+  <div id="footer">sensitive dependence on initial conditions — the mathematical signature of chaos</div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+const charW = 7, charH = 12;
+const COLS = 130, ROWS = 55;
+canvas.width = COLS * charW;
+canvas.height = ROWS * charH;
+ctx.font = charH + 'px monospace';
+ctx.textBaseline = 'top';
+
+// Lorenz parameters
+const SIGMA = 10, RHO = 28, BETA = 8/3;
+const DT = 0.006;
+const STEPS_PER_FRAME = 3;
+const TRAIL_LEN = 2200;
+
+function deriv(s) {
+  return {
+    dx: SIGMA * (s.y - s.x),
+    dy: s.x * (RHO - s.z) - s.y,
+    dz: s.x * s.y - BETA * s.z
+  };
+}
+
+function rk4step(s, dt) {
+  const k1 = deriv(s);
+  const s2 = {x: s.x + k1.dx*dt/2, y: s.y + k1.dy*dt/2, z: s.z + k1.dz*dt/2};
+  const k2 = deriv(s2);
+  const s3 = {x: s.x + k2.dx*dt/2, y: s.y + k2.dy*dt/2, z: s.z + k2.dz*dt/2};
+  const k3 = deriv(s3);
+  const s4 = {x: s.x + k3.dx*dt, y: s.y + k3.dy*dt, z: s.z + k3.dz*dt};
+  const k4 = deriv(s4);
+  return {
+    x: s.x + (dt/6)*(k1.dx + 2*k2.dx + 2*k3.dx + k4.dx),
+    y: s.y + (dt/6)*(k1.dy + 2*k2.dy + 2*k3.dy + k4.dy),
+    z: s.z + (dt/6)*(k1.dz + 2*k2.dz + 2*k3.dz + k4.dz)
+  };
+}
+
+// two nearly identical starting points
+let stateA = {x: 0.1, y: 0, z: 0};
+let stateB = {x: 0.1 + 0.00001, y: 0, z: 0};
+
+let trailA = [];
+let trailB = [];
+
+let theta = 0;
+
+const RAMP = " .:-=+*#%@";
+
+function project(p, angle) {
+  // center roughly on attractor centroid
+  const cx = p.x, cy = p.y, cz = p.z - 25;
+  // rotate around vertical (z) axis
+  const rx = cx * Math.cos(angle) - cy * Math.sin(angle);
+  const ry = cx * Math.sin(angle) + cy * Math.cos(angle);
+  const rz = cz;
+
+  // simple perspective
+  const dist = 90;
+  const scale = 260;
+  const f = scale / (dist + ry * 0.9);
+
+  const px = COLS/2 + rx * f * 0.55;
+  const py = ROWS/2 - rz * f * 0.42 + 4;
+  const depth = ry; // used for shading
+
+  return {px, py, depth};
+}
+
+function drawTrail(grid, depthBuf, colorBuf, trail, colorId) {
+  const n = trail.length;
+  for (let i = 0; i < n; i++) {
+    const proj = project(trail[i], theta);
+    const col = Math.round(proj.px);
+    const row = Math.round(proj.py);
+    if (col < 0 || col >= COLS || row < 0 || row >= ROWS) continue;
+
+    const idx = row * COLS + col;
+    // recency brightness: newer points brighter
+    const recency = i / n;
+    const brightness = Math.max(0, Math.min(1, recency * 0.85 + 0.15));
+
+    if (brightness > depthBuf[idx]) {
+      depthBuf[idx] = brightness;
+      const rampIdx = Math.min(RAMP.length - 1, Math.floor(brightness * RAMP.length));
+      grid[idx] = RAMP[rampIdx];
+      colorBuf[idx] = colorId;
+    }
+  }
+}
+
+let frame = 0;
+
+function tick() {
+  for (let s = 0; s < STEPS_PER_FRAME; s++) {
+    stateA = rk4step(stateA, DT);
+    stateB = rk4step(stateB, DT);
+    trailA.push({x: stateA.x, y: stateA.y, z: stateA.z});
+    trailB.push({x: stateB.x, y: stateB.y, z: stateB.z});
+    if (trailA.length > TRAIL_LEN) trailA.shift();
+    if (trailB.length > TRAIL_LEN) trailB.shift();
+  }
+
+  theta += 0.0035;
+
+  const grid = new Array(COLS * ROWS).fill(' ');
+  const depthBuf = new Array(COLS * ROWS).fill(-1);
+  const colorBuf = new Array(COLS * ROWS).fill(0);
+
+  drawTrail(grid, depthBuf, colorBuf, trailA, 1); // green
+  drawTrail(grid, depthBuf, colorBuf, trailB, 2); // amber
+
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLS; col++) {
+      const idx = row * COLS + col;
+      const ch = grid[idx];
+      if (ch === ' ') continue;
+      const b = depthBuf[idx];
+      if (colorBuf[idx] === 1) {
+        const g = Math.floor(140 + b * 115);
+        ctx.fillStyle = `rgb(30, ${g}, ${Math.floor(80+b*80)})`;
+      } else {
+        const rr = Math.floor(180 + b * 75);
+        ctx.fillStyle = `rgb(${rr}, ${Math.floor(120+b*70)}, 40)`;
+      }
+      ctx.fillText(ch, col * charW, row * charH);
+    }
+  }
+
+  // update delta readout occasionally
+  if (frame % 12 === 0) {
+    const dx = stateA.x - stateB.x, dy = stateA.y - stateB.y, dz = stateA.z - stateB.z;
+    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+    document.getElementById('delta').innerHTML =
+      `separation now: <span class="amber">Δ(t) = ${dist.toFixed(4)}</span> &nbsp;·&nbsp; started at 1e-5`;
+  }
+
+  frame++;
+  requestAnimationFrame(tick);
+}
+
+tick();
+</script>
+</body>
+</html>

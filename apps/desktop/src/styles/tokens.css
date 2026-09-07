@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+/*
+ * PotatoLLM design tokens — dark-first technical aesthetic.
+ * Every color/radius/shadow/timing used in the app should trace back to a
+ * token here, not a value invented per-screen (spec section 49).
+ *
+ * V1 is dark-only (matches the "GPU monitoring software" target aesthetic).
+ * A light theme can be added later without touching components, since
+ * everything consumes semantic tokens, not raw colors.
+ */
+@theme {
+  /* Surfaces — layered from background to elevated (modals/popovers) */
+  --color-bg: #0a0b0d;
+  --color-surface: #121418;
+  --color-surface-elevated: #1a1d23;
+  --color-surface-hover: #1a1e25;
+
+  --color-border: #262a31;
+  --color-border-strong: #383e47;
+
+  /* Text (named "fg" not "text" so Tailwind utilities read as text-fg /
+     text-fg-secondary rather than the redundant text-text-primary) */
+  --color-fg: #e8eaed;
+  --color-fg-secondary: #9aa1ac;
+  --color-fg-muted: #5f6672;
+  /* A darker "quiet" grey than -muted, re-pointed at --pot-ink-soft in
+     potato.css. Used where -muted reads as washed out (Usage page). */
+  --color-fg-soft: #c2c6cc;
+
+  /* General interactive accent — technical cyan, used for links, focus rings,
+     active nav, live-monitor highlights. */
+  --color-accent: #22d3ee;
+  --color-accent-strong: #67e3f5;
+  --color-accent-muted: color-mix(in srgb, var(--color-accent) 14%, transparent);
+
+  /* Potato accent — reserved for potato-branded moments only: Potato Score,
+     "Make It Potato" CTA, potato classification badges. Not a general accent. */
+  --color-potato: #e8a33d;
+  --color-potato-strong: #f5b84f;
+  --color-potato-muted: color-mix(in srgb, var(--color-potato) 14%, transparent);
+
+  /* Status */
+  --color-success: #4ade80;
+  --color-success-muted: color-mix(in srgb, var(--color-success) 14%, transparent);
+  --color-warning: #fbbf24;
+  --color-warning-muted: color-mix(in srgb, var(--color-warning) 14%, transparent);
+  --color-danger: #f87171;
+  --color-danger-muted: color-mix(in srgb, var(--color-danger) 14%, transparent);
+
+  /* Chart categorical palette — dark-surface steps from the dataviz skill's
+     validated default (fixed hue order, never cycled/reassigned). V1 is
+     dark-only so only the dark steps are defined; a light set would need its
+     own validation pass, not a mechanical flip. Used by Usage's charts:
+     slots 1/2/3 for per-model identity (donut, session rows), orange/violet
+     for the prompt/completion pair (bar chart + token-breakdown donut). */
+  --color-chart-1: #3987e5; /* blue */
+  --color-chart-2: #d95926; /* orange — prompt tokens */
+  --color-chart-3: #199e70; /* aqua */
+  --color-chart-4: #9085e9; /* violet — completion tokens */
+
+  /* Typography — system stacks only, keeps the app fully offline (no font
+     fetch), can move to a bundled font later without changing tokens. */
+  --font-sans: ui-sans-serif, "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+
+  /* Radii — small and mostly-square, deliberately not the rounded-SaaS look */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Shadows — subtle, dark-mode calibrated */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --shadow-glow-accent: 0 0 0 1px color-mix(in srgb, var(--color-accent) 40%, transparent);
+  --shadow-glow-potato: 0 0 0 1px color-mix(in srgb, var(--color-potato) 40%, transparent);
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 350ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent-muted);
+}
+
+/* Thin, technical scrollbars instead of the OS default chrome look */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-strong);
+  border-radius: 999px;
+  border: 2px solid var(--color-bg);
+}

@@ -1,0 +1,35 @@
+# Normalize line endings: text files stored as LF in the repository, checked
+# out with the platform default. Keeps diffs clean across Windows, macOS and
+# Linux contributors.
+* text=auto
+
+# Explicit text
+*.ts    text
+*.tsx   text
+*.js    text
+*.jsx   text
+*.json  text
+*.css   text
+*.html  text
+*.md    text
+*.py    text
+*.rs    text
+*.toml  text
+*.yml   text
+*.yaml  text
+*.mako  text
+*.ini   text
+
+# Binary assets, never touched by line ending conversion
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.icns  binary
+*.otf   binary
+*.ttf   binary
+*.woff  binary
+*.woff2 binary
+*.msi   binary
+*.exe   binary

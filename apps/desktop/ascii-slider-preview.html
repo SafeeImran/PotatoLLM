@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PotatoLLM — potato sliders</title>
+    <style>
+      :root { color-scheme:dark; --black:#090909; --near-black:#121212; --edge:#303030; --white:#f4f4f1; --grey:#8b8b87; }
+      * { box-sizing:border-box; }
+      body { min-height:100vh; margin:0; display:grid; place-items:center; padding:28px; background:var(--black); color:var(--white); font-family:ui-sans-serif,system-ui,"Segoe UI",sans-serif; }
+      main { width:min(100%,430px); padding:20px; border:1px solid var(--edge); background:var(--near-black); }
+      header { display:flex; justify-content:space-between; align-items:center; margin-bottom:23px; padding-bottom:14px; border-bottom:1px solid var(--edge); } h1 { margin:0; font-size:12px; letter-spacing:.05em; } header span,footer { color:var(--grey); font:9px ui-monospace,Consolas,monospace; }
+      .control { position:relative; margin-bottom:21px; }.head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; }.label { font-size:12px; font-weight:620; }.value { font:700 11px ui-monospace,Consolas,monospace; }
+      .field { position:relative; height:28px; overflow:hidden; border:1px solid var(--edge); background:#050505; }.fill { position:relative; width:var(--progress); height:100%; overflow:hidden; border-right:1px solid var(--white); background:repeating-linear-gradient(90deg,#171717 0 7px,#101010 7px 14px); transition:width 340ms cubic-bezier(.22,1,.36,1); }.crops { position:absolute; inset:0; display:flex; align-items:center; justify-content:space-around; min-width:42px; padding:0 4px; }.potato { width:16px; height:16px; flex:0 0 16px; color:var(--white); animation:potato-grow 460ms cubic-bezier(.16,1,.3,1) both; filter:drop-shadow(0 1px 0 #000); }.potato path { fill:currentColor; }.potato circle { fill:#090909; }
+      input { position:absolute; inset:24px 0 auto; z-index:2; width:100%; height:28px; margin:0; cursor:ew-resize; opacity:0; }.bounds { display:flex; justify-content:space-between; margin-top:4px; color:var(--grey); font:8px ui-monospace,Consolas,monospace; } footer { padding-top:2px; }
+      @keyframes potato-grow { from { opacity:0; transform:translateY(6px) scale(.55); } to { opacity:1; transform:translateY(0) scale(1); } }
+      @media (prefers-reduced-motion: reduce) { .fill,.potato { animation:none; transition:none; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header><h1>GENERATION</h1><span>potato / local</span></header>
+      <section aria-label="Generation parameters">
+        <div class="control" data-format="fixed" data-decimals="2"><div class="head"><span class="label">Temperature</span><output class="value"></output></div><div class="field" aria-hidden="true"><div class="fill"><div class="crops"></div></div></div><input type="range" min="0" max="2" step="0.05" value="0.8" aria-label="Temperature" /><div class="bounds"><span>steady</span><span>creative</span></div></div>
+        <div class="control" data-format="fixed" data-decimals="2"><div class="head"><span class="label">Top P</span><output class="value"></output></div><div class="field" aria-hidden="true"><div class="fill"><div class="crops"></div></div></div><input type="range" min="0" max="1" step="0.01" value="0.95" aria-label="Top P" /><div class="bounds"><span>focused</span><span>open</span></div></div>
+        <div class="control" data-format="integer"><div class="head"><span class="label">Top K</span><output class="value"></output></div><div class="field" aria-hidden="true"><div class="fill"><div class="crops"></div></div></div><input type="range" min="1" max="200" step="1" value="40" aria-label="Top K" /><div class="bounds"><span>narrow</span><span>wide</span></div></div>
+        <div class="control" data-format="integer"><div class="head"><span class="label">Max tokens</span><output class="value"></output></div><div class="field" aria-hidden="true"><div class="fill"><div class="crops"></div></div></div><input type="range" min="16" max="8192" step="16" value="1024" aria-label="Max tokens" /><div class="bounds"><span>short</span><span>long</span></div></div>
+      </section>
+      <footer>slide to grow · arrow keys supported</footer>
+    </main>
+    <script>
+      const potato = `<svg class="potato" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 1h6v1h2v2h1v7h-1v2h-2v1H5v-1H3v-2H2V4h1V2h2z"/><circle cx="5" cy="6" r="1"/><circle cx="10" cy="4" r="1"/><circle cx="11" cy="10" r="1"/><circle cx="6" cy="11" r="1"/></svg>`;
+      document.querySelectorAll('.control').forEach((control) => {
+        const input=control.querySelector('input'), output=control.querySelector('output'), fill=control.querySelector('.fill'), crops=control.querySelector('.crops');
+        const update=()=>{const value=Number(input.value), min=Number(input.min), max=Number(input.max), progress=(value-min)/(max-min); output.value=control.dataset.format==='integer'?Math.round(value).toLocaleString():value.toFixed(Number(control.dataset.decimals)); fill.style.setProperty('--progress',`${progress*100}%`); const count=Math.max(0,Math.ceil(progress*10)); crops.innerHTML=Array.from({length:count},()=>potato).join('');}; input.addEventListener('input',update); update();
+      });
+    </script>
+  </body>
+</html>

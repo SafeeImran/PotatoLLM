@@ -1,0 +1,267 @@
+/*
+ * Assistant output: Markdown, fenced code and KaTeX math.
+ *
+ * Everything resolves through the --pot-* palette, so the transcript themes
+ * with the rest of the shell instead of shipping a second (light-only)
+ * highlight.js stylesheet.
+ */
+
+.pot-md {
+  font-size: 14px;
+  line-height: 1.62;
+  color: var(--pot-ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.pot-md > :first-child {
+  margin-top: 0;
+}
+.pot-md > :last-child {
+  margin-bottom: 0;
+}
+
+.pot-md p {
+  margin: 0 0 12px;
+}
+
+.pot-md h1,
+.pot-md h2,
+.pot-md h3,
+.pot-md h4 {
+  margin: 20px 0 8px;
+  color: var(--pot-ink);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+.pot-md h1 { font-size: 18px; }
+.pot-md h2 { font-size: 16px; }
+.pot-md h3 { font-size: 14.5px; }
+.pot-md h4 { font-size: 13.5px; }
+
+.pot-md ul,
+.pot-md ol {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+.pot-md li {
+  margin: 3px 0;
+}
+.pot-md li::marker {
+  color: var(--pot-faint);
+}
+.pot-md li > p {
+  margin: 0 0 4px;
+}
+
+/* GFM task lists render a disabled checkbox; keep it aligned with the text. */
+.pot-md input[type="checkbox"] {
+  margin-right: 6px;
+  accent-color: var(--pot-accent-dot);
+  vertical-align: -1px;
+}
+.pot-md li:has(> input[type="checkbox"]) {
+  list-style: none;
+  margin-left: -18px;
+}
+
+.pot-md blockquote {
+  margin: 0 0 12px;
+  padding: 2px 0 2px 12px;
+  border-left: 2px solid var(--pot-accent-edge);
+  color: var(--pot-sub);
+}
+
+.pot-md hr {
+  margin: 18px 0;
+  border: 0;
+  border-top: 1px solid var(--pot-line);
+}
+
+.pot-md a {
+  color: var(--pot-accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.pot-md strong {
+  color: var(--pot-ink);
+  font-weight: 700;
+}
+
+/* Wide tables scroll inside their own box rather than stretching the column. */
+.pot-md-table {
+  margin: 0 0 12px;
+  overflow-x: auto;
+  border: 1px solid var(--pot-line);
+  border-radius: 10px;
+}
+.pot-md-table table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12.5px;
+}
+.pot-md-table th,
+.pot-md-table td {
+  padding: 7px 11px;
+  text-align: left;
+  border-bottom: 1px solid var(--pot-line);
+  white-space: nowrap;
+}
+.pot-md-table th {
+  background: var(--pot-raised);
+  color: var(--pot-ink);
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: 0.2px;
+}
+.pot-md-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ---- Code ---- */
+
+.pot-code-inline {
+  font-family: var(--pot-mono);
+  font-size: 0.88em;
+  padding: 1px 5px;
+  border: 1px solid var(--pot-line);
+  border-radius: 5px;
+  background: var(--pot-raised);
+  color: var(--pot-ink);
+}
+
+.pot-code {
+  margin: 0 0 12px;
+  border: 1px solid var(--pot-line-strong);
+  border-radius: 10px;
+  background: var(--pot-field);
+  overflow: hidden;
+}
+
+.pot-code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 8px 5px 12px;
+  border-bottom: 1px solid var(--pot-line);
+  background: var(--pot-raised);
+}
+
+.pot-code-lang {
+  font-family: var(--pot-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--pot-faint);
+}
+
+.pot-code-copy {
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 5px;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--pot-sub);
+  cursor: pointer;
+  transition: background .16s ease, color .16s ease, border-color .16s ease;
+}
+.pot-code-copy:hover {
+  background: var(--pot-accent-soft);
+  border-color: var(--pot-accent-edge);
+  color: var(--pot-ink);
+}
+
+.pot-code pre {
+  margin: 0;
+  padding: 11px 13px;
+  overflow-x: auto;
+}
+.pot-code code {
+  font-family: var(--pot-mono);
+  font-size: 12px;
+  line-height: 1.58;
+  color: var(--pot-ink);
+  white-space: pre;
+}
+
+/* highlight.js tokens, mapped onto the theme's code palette. */
+.hljs-comment,
+.hljs-quote {
+  color: var(--pot-code-com);
+  font-style: italic;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-doctag,
+.hljs-name {
+  color: var(--pot-code-key);
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-meta-string {
+  color: var(--pot-code-str);
+}
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link {
+  color: var(--pot-code-num);
+}
+.hljs-title,
+.hljs-title.function_,
+.hljs-section {
+  color: var(--pot-code-fn);
+}
+.hljs-type,
+.hljs-class .hljs-title,
+.hljs-built_in,
+.hljs-title.class_ {
+  color: var(--pot-code-type);
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-property,
+.hljs-params {
+  color: var(--pot-code-attr);
+}
+.hljs-meta {
+  color: var(--pot-faint);
+}
+.hljs-deletion {
+  color: var(--pot-danger);
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: 700;
+}
+
+/* ---- Math ---- */
+
+.pot-md .katex {
+  color: var(--pot-ink);
+  font-size: 1.03em;
+}
+
+/* Display math is centred by KaTeX; give it its own scroller so a long
+   derivation can't widen the transcript column. */
+.pot-md .katex-display {
+  margin: 14px 0;
+  padding: 2px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.pot-md .katex-error {
+  color: var(--pot-danger);
+  font-family: var(--pot-mono);
+  font-size: 0.9em;
+}

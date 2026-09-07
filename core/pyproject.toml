@@ -1,0 +1,56 @@
+[project]
+name = "potato-core"
+version = "0.1.0"
+description = "PotatoLLM Potato Core — local hardware-aware LLM orchestration engine"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    "psutil>=6.0",
+    "py-cpuinfo>=9.0",
+    "nvidia-ml-py>=12.560",
+    "httpx>=0.27",
+    "tiktoken>=0.8",
+    # PDF text extraction for chat attachments. Pure-Python and ~1 MB, so it
+    # stays a core dependency rather than an optional extra — .docx needs no
+    # dependency at all (it is a zip of XML).
+    "pypdf>=5.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+]
+# Heavy ML deps for real fine-tuning (Phase 12). Deliberately optional — the
+# Training Engine checks for these at call time and fails with an honest
+# "not installed" error rather than faking training, per spec section 51.
+# Not installed in this environment: real training is scaffolded (dataset
+# analysis, hyperparameter mapping, job lifecycle) but gated until a dev
+# opts into the multi-GB install with `pip install -e ".[train]"`.
+train = [
+    "torch>=2.4",
+    "transformers>=4.45",
+    "peft>=0.13",
+    "trl>=0.11",
+    "bitsandbytes>=0.44; platform_system != 'Windows'",
+]
+# Phase 16: bundles Potato Core into a standalone exe (see
+# core/packaging/potato-core.spec) that Tauri ships as a resource, so
+# packaged users don't need a Python install at all.
+package = [
+    "pyinstaller>=6.10",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["potato_core*"]

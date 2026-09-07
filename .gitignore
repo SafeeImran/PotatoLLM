@@ -1,0 +1,69 @@
+# Node / frontend
+node_modules/
+apps/desktop/dist/
+apps/desktop/dist-ssr/
+*.local
+
+# Tauri / Rust
+apps/desktop/src-tauri/target/
+apps/desktop/src-tauri/Cargo.lock.bak
+
+# Python
+core/.venv/
+core/**/__pycache__/
+*.pyc
+core/*.egg-info/
+core/.pytest_cache/
+
+# Vendored inference binaries (large, platform specific, fetched on setup,
+# see DEVELOPMENT.md). Never commit these.
+core/vendor/
+
+# PyInstaller packaging output (see core/packaging/potato-core.spec, built
+# on demand by `npm run tauri build`). Never commit.
+core/build/
+core/dist/
+
+# Built installers and other large release artifacts. Attach these to a
+# GitHub Release instead of committing them.
+releases/
+*.msi
+*.exe.blockmap
+
+# Loose trial font copies kept at the repo root. The copies the app actually
+# loads live under apps/desktop/public/fonts/. See docs/FONTS.md.
+/GT-Walsheim-Condensed-Bold-Trial-*.otf
+/GT-Walsheim-Condensed-Light-Trial-*.otf
+
+# PotatoLLM local data (models, DB, logs). Never commit user data.
+data/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+logs/
+
+# Local presentation / manim working folder, not part of the repo
+presentation/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Secrets and local environment. Never commit these.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+service-account*.json
+*-service-account.json
+secrets.json
+credentials.json
+usageprototype.jpeg

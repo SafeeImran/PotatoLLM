@@ -1,0 +1,1128 @@
+/*
+ * Potato theme — the --pot-* palette from PotatoLLM-Playground-standalone.html,
+ * plus the mapping that re-points the existing Tailwind @theme tokens at it.
+ *
+ * The mapping is what lets the prototype become the app's face without
+ * rewriting every page: Dashboard, Settings, Usage and friends already consume
+ * semantic tokens (bg-surface, text-fg-muted, border-border), so pointing those
+ * tokens at the potato palette themes all of them at once, light and dark.
+ *
+ * Everything is declared on the SAME element (html:root) on purpose. Tailwind's
+ * derived tokens — --color-accent-muted and friends — are color-mix()es that
+ * resolve against whatever --color-accent is on the element they're declared
+ * on, so a mid-tree wrapper would never reach them. html:root also outranks
+ * Tailwind's plain :root, so cascade order between the two stylesheets can't
+ * bite us.
+ *
+ * The theme flag lives on <html data-pot-theme="light|dark"> — see usePotatoTheme.
+ */
+
+html:root {
+  /* ---- Prototype palette: light ----
+   * Light mode is deliberately monochrome outside the sidebar: white, greys,
+   * and near-black ink. The warm yellow accent is scoped to `aside` and the
+   * sidebar's portaled popovers via the override block below. --pot-accent-ink
+   * is a dark grey everywhere so amber/orange text no longer appears on main
+   * pages, while the sidebar override restores the warmer ink for its own
+   * accents.
+   */
+  --pot-bg: #fafafa;
+  --pot-panel: #ffffff;
+  --pot-raised: #f2f2f2;
+  --pot-hover: #ededed;
+  --pot-line: #d6d6d6;
+  --pot-line-strong: #bfbfbf;
+  --pot-ink: #171717;
+  --pot-ink-soft: #525252;
+  --pot-sub: #737373;
+  --pot-faint: #a3a3a3;
+  --pot-ghost: #c2c2c2;
+  /* Resting colour of the left-panel nav icons. Light mode keeps the muted
+     grey; dark mode lifts it to an ash white so the sketch icons don't
+     disappear into the panel (see Sidebar.tsx). */
+  --pot-nav-icon: #8a8a8a;
+  --pot-accent: #e5e5e5;
+  --pot-accent-line: #f0f0f0;
+  --pot-accent-soft: #f5f5f5;
+  --pot-accent-ink: #404040;
+  --pot-accent-edge: #d4d4d4;
+  --pot-accent-dot: #737373;
+  /* Filled-button palette. Light mode stays monochrome like the rest of the
+     light theme; the dark override (below) is where it becomes gold. */
+  --pot-gold-bg: #2f2f2f;
+  --pot-gold-hover-bg: #404040;
+  --pot-gold-fg: #fafafa;
+  --pot-gold-edge: #1f1f1f;
+  --pot-progress-accent: #737373;
+  --pot-status: #f5f5f5;
+  --pot-status-line: #e5e5e5;
+  --pot-field: #fafafa;
+  --pot-inv-bg: #171717;
+  --pot-inv-fg: #ffffff;
+  --pot-ok: #5f9e59;
+  --pot-danger: #b4453f;
+  /* Text that sits on a filled --pot-accent surface. */
+  --pot-on-accent: #171717;
+  /* The Lorenz-attractor idle art's dim strand. */
+  --pot-lorenz-ink: var(--pot-sub);
+  /* Syntax highlighting — kept readable against the light field. */
+  --pot-code-com: #737373;
+  --pot-code-key: #a0402f;
+  --pot-code-str: #4d7a3f;
+  --pot-code-num: #6b5818;
+  --pot-code-fn: #2f5a86;
+  --pot-code-type: #6b4d9e;
+  --pot-code-attr: #7a5820;
+}
+
+/* Sidebar-only warm palette in light mode — the "Baked Potato" color theme
+   (see useAppearance.ts). The sidebar and its portaled popovers keep the
+   original yellow accent; every other surface stays monochrome. The
+   "Monochromatic" theme option turns this block off entirely, so the
+   sidebar falls through to the plain html:root tokens above and reads as
+   the exact same palette as the main pages. Dark mode never had a separate
+   sidebar palette to begin with, so the theme choice has nothing to do
+   there — it is already one palette throughout. */
+html:root:not([data-pot-theme="dark"]):not([data-pot-color-theme="monochromatic"]) aside,
+html:root:not([data-pot-theme="dark"]):not([data-pot-color-theme="monochromatic"]) [data-pot-sidebar-popover] {
+  --pot-bg: #fff4de;
+  --pot-panel: #ffffd4;
+  --pot-raised: #fadfad;
+  --pot-hover: #f3ead9;
+  --pot-line: #e8dcc6;
+  --pot-line-strong: #dfcba8;
+  --pot-ink: #2d2923;
+  --pot-ink-soft: color-mix(in srgb, #2d2923 88%, #81796c 12%);
+  --pot-sub: #e6ab3d;
+  --pot-faint: #a69d8f;
+  --pot-ghost: color-mix(in srgb, #a69d8f 60%, #fff8ed 40%);
+  --pot-accent: color-mix(in srgb, #f5e2b5 80%, #fff8ed 20%);
+  --pot-accent-line: #fff0cf;
+  --pot-accent-soft: color-mix(in srgb, #fff0cf 55%, #fff8ed 45%);
+  --pot-accent-ink: #9c7839;
+  --pot-accent-edge: #e7bf6c;
+  --pot-accent-dot: #d7a13a;
+  --pot-status: #f1e5d0;
+  --pot-status-line: #e8dcc6;
+  --pot-field: #fff8ed;
+  --pot-inv-bg: #28251f;
+  --pot-inv-fg: #ffffff;
+  --pot-on-accent: #2d2923;
+  --pot-lorenz-ink: var(--pot-sub);
+}
+
+html:root[data-pot-theme="dark"] {
+  /* ---- Prototype palette: dark ---- */
+  --pot-bg: #0c0c0b;
+  --pot-panel: #100f0e;
+  --pot-raised: #191917;
+  --pot-hover: #1b1b18;
+  --pot-line: #232320;
+  --pot-line-strong: #2c2c28;
+  --pot-ink: #f2f2ec;
+  --pot-ink-soft: #dcdcd4;
+  --pot-sub: #9b9b90;
+  --pot-faint: #77776d;
+  --pot-ghost: #4d4d46;
+  --pot-nav-icon: #d7d7cd;
+  --pot-accent: #efdf62;
+  --pot-accent-line: #46401d;
+  --pot-accent-soft: #211f12;
+  --pot-accent-ink: #e3d585;
+  --pot-accent-edge: #5c5423;
+  --pot-accent-dot: #d8c73f;
+  /* Filled buttons in dark mode: a gold that's a little softer than the raw
+     accent but still clearly yellow. Hover just brightens it. */
+  --pot-gold-bg: #c9b34c;
+  --pot-gold-hover-bg: #dcc75c;
+  --pot-gold-fg: #0d0d0d;
+  --pot-gold-edge: #7a6f36;
+  /* Progress-bar fill/glow tone — a touch more muted than the button gold. */
+  --pot-progress-accent: #b8a64e;
+  --pot-status: #131311;
+  --pot-status-line: #26261f;
+  --pot-field: #141412;
+  --pot-inv-bg: #f2f2ec;
+  --pot-inv-fg: #0c0c0b;
+  --pot-ok: #7fbf78;
+  --pot-danger: #e07b74;
+  --pot-on-accent: #0d0d0d;
+  --pot-lorenz-ink: var(--pot-faint);
+  --pot-code-com: #6b6b62;
+  --pot-code-key: #e08b74;
+  --pot-code-str: #a6c98d;
+  --pot-code-num: #e3d585;
+  --pot-code-fn: #8fb8e0;
+  --pot-code-type: #c4a8ec;
+  --pot-code-attr: #e0c98a;
+}
+
+html:root {
+  /* Film-grain texture — desaturated SVG fractal noise, tiled small. Used as
+     an overlay on filled-button hover and on the progress-bar glow. Encoded
+     inline so the app stays offline. */
+  --pot-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+
+  /* ---- Tailwind semantic tokens, re-pointed at the palette above ---- */
+  --color-bg: var(--pot-bg);
+  --color-surface: var(--pot-panel);
+  --color-surface-elevated: var(--pot-raised);
+  --color-surface-hover: var(--pot-hover);
+
+  --color-border: var(--pot-line);
+  --color-border-strong: var(--pot-line-strong);
+
+  --color-fg: var(--pot-ink);
+  --color-fg-secondary: var(--pot-sub);
+  --color-fg-muted: var(--pot-faint);
+  /* A deliberately darker "quiet" grey — for places where the muted tone
+     reads as washed out (the Usage page's labels and footnotes). Theme-aware
+     through --pot-ink-soft. */
+  --color-fg-soft: var(--pot-ink-soft);
+
+  /* The prototype is single-accent: the technical cyan would read as a second,
+     competing brand next to it, so accent and potato both resolve to the
+     palette's yellow and the potato-only surfaces keep their own darker ink. */
+  --color-accent: var(--pot-accent-dot);
+  --color-accent-strong: var(--pot-accent-ink);
+  --color-accent-muted: var(--pot-accent-soft);
+
+  --color-potato: var(--pot-accent-dot);
+  --color-potato-strong: var(--pot-accent-ink);
+  --color-potato-muted: var(--pot-accent-soft);
+
+  --color-success: var(--pot-ok);
+  --color-danger: var(--pot-danger);
+
+  /* GT Walsheim Condensed is the app's only typeface (see fonts.css). The
+     three token names are kept as aliases so component code does not have to
+     care, and so a future second face has one place to land. Markers are
+     drawn as inline SVG rather than characters (see components/layout/icons.tsx)
+     regardless of which face is loaded, so nothing here depends on this one's
+     glyph coverage. */
+  --pot-sans: "GT Walsheim Condensed", sans-serif;
+  --pot-mono: var(--pot-sans);
+  --pot-num: var(--pot-sans);
+
+  --font-sans: var(--pot-sans);
+  --font-mono: var(--pot-sans);
+
+  /* Subheadings render in the real Bold cut of the active face. GT Walsheim
+     Condensed now ships a true Bold file (fonts.css); Grotesk just asks for
+     its own 700. Consumed by the h2/h3/h4 + label rule near the bottom of
+     this file. */
+  --pot-heading-font: "GT Walsheim Condensed Bold", "GT Walsheim Condensed", sans-serif;
+  --pot-heading-weight: 700;
+
+  color-scheme: light;
+
+  /* Chart palette — warm tones for light mode. Replaces the dark-only hexes
+     from tokens.css with colors that read clearly on cream/white surfaces. */
+  --color-chart-1: #c67a2e;
+  --color-chart-2: #d49a2a;
+  --color-chart-3: #a67340;
+  --color-chart-4: #b85c3a;
+}
+
+html:root[data-pot-theme="dark"] {
+  color-scheme: dark;
+
+  --color-chart-1: #e8a040;
+  --color-chart-2: #f0c040;
+  --color-chart-3: #c49060;
+  --color-chart-4: #d07050;
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--pot-bg);
+  color: var(--pot-ink);
+  font-family: var(--pot-sans);
+  /* GT Walsheim Condensed reads tight and small at body sizes — a condensed
+     face by design — so it gets a wider default track and a size bump to stay
+     comfortably readable. Most components' own tuned negative letter-spacing
+     (headings, nav labels) still wins locally where it's set explicitly; this
+     is the baseline for everything that doesn't override it. Grotesk keeps a
+     near-neutral track (see the override below). */
+  letter-spacing: 0.11em;
+}
+
+/* Letter-spacing for the Sidebar / Live Monitor labels that set it inline
+   (they used negative tracking, which is what made Walsheim read as a wall of
+   letters there). Referenced as `letterSpacing: "var(--pot-nav-tracking)"`
+   from those components so the value can follow the font-style choice —
+   Walsheim needs the air, Grotesk does not. */
+:root {
+  --pot-nav-tracking: 0.06em;
+}
+html[data-pot-font-family="grotesk"] {
+  --pot-nav-tracking: 0.005em;
+}
+
+/* Appearance → Font Style (see useAppearance.ts). GT Walsheim Condensed is
+   the default (set on --pot-sans above); this is the only override needed,
+   for the earlier Space Grotesk. Same specificity as the base html:root
+   rule that sets --pot-sans (element + one attribute/pseudo-class each), so
+   it wins by simply coming later in the file. */
+html[data-pot-font-family="grotesk"] {
+  --pot-sans: "Space Grotesk", sans-serif;
+  --pot-heading-font: "Space Grotesk", sans-serif;
+}
+html[data-pot-font-family="grotesk"] body {
+  letter-spacing: 0.01em;
+}
+
+/* Appearance → Font Size (see useAppearance.ts). Two mechanisms, one control:
+   - the root `rem` rescale drives every page built from Tailwind's `text-*`
+     utilities (Dashboard, Usage, Model Library, Settings, …);
+   - `--pot-shell-scale` drives a `zoom` on the shell chrome that is laid out
+     in hand-tuned pixels instead — the Sidebar, Header, Live Monitor and
+     Playground — so the setting reaches the whole app, not just the Tailwind
+     pages (see `.pot-shell-scale` below). GT Walsheim runs small, so the
+     baseline rem is a touch larger than a system font would need. */
+html[data-pot-font-size="sm"] { font-size: 16px; --pot-shell-scale: 0.92; }
+html[data-pot-font-size="md"] { font-size: 18px; --pot-shell-scale: 1; }
+html[data-pot-font-size="lg"] { font-size: 21px; --pot-shell-scale: 1.14; }
+
+/* Section headings in the shell chrome (Sidebar groups, Live Monitor's
+   "LIVE MONITOR" + each Section title) track the Font Size setting directly,
+   not only through the shell `zoom` — so the heading size responds even where
+   the zoom is visually subtle. */
+html[data-pot-font-size="sm"] .pot-section-label { font-size: 10px; }
+html[data-pot-font-size="lg"] .pot-section-label { font-size: 12.5px; }
+
+/* The pixel-laid-out shell chrome. `zoom` (not `transform: scale`) so the
+   element still takes its scaled size in layout and nothing overlaps. md is
+   1 — the common case pays nothing. Applied to the Sidebar/Header/Live
+   Monitor/Playground roots via this class. */
+.pot-shell-scale {
+  zoom: var(--pot-shell-scale, 1);
+}
+
+/* Subheadings across the app render in the Bold cut of the active face. */
+h2, h3, h4,
+.pot-section-label,
+.pot-popover-label {
+  font-family: var(--pot-heading-font);
+  font-weight: var(--pot-heading-weight);
+}
+
+/* Numbers that update in place — throughput, context, parameter values.
+   Forced tabular regardless of the loaded face's own default, so a ticking
+   readout can't start shuffling the row if that ever changes. */
+.pot-num {
+  font-family: var(--pot-num);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Scrollbars: the prototype's thin, trackless treatment. */
+* {
+  scrollbar-color: var(--pot-line-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--pot-line-strong);
+  border-radius: 8px;
+  border: 0;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::placeholder {
+  color: var(--pot-ghost);
+}
+
+@keyframes potFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes potSlideIn {
+  from { opacity: 0; transform: translateX(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes potPop {
+  0% { opacity: 0; transform: translateY(6px) scale(.97); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes potBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes potRowIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes potPulseHead {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .35; }
+}
+@keyframes potMenuIn {
+  from { opacity: 0; transform: translateY(-4px) scale(.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes potTextGlow {
+  from { background-position: -140% 0; }
+  to { background-position: 240% 0; }
+}
+
+/* The sketch-style nav/utility icon set (icons.tsx's DrawnIcon — see the
+   reference sketches in icons/) reads as hand-drawn largely through one
+   trait: a small broken-line stroke instead of a solid one. Applied as CSS
+   rather than baked into each path's `d`, so the same handful of icons keep
+   their existing geometry. The entrance plays the dash pattern sliding into
+   its resting offset once, on mount — a light "assembling" read rather than
+   a full per-path draw-on (which would need a hand-measured length per icon,
+   fragile across this many mixed paths/rects/circles). Reuses the app's
+   existing entrance easing rather than a new curve. */
+@keyframes potIconForm {
+  from { stroke-dashoffset: 44; opacity: 0; transform: scale(.82); }
+  to { stroke-dashoffset: 0; opacity: 1; transform: none; }
+}
+.pot-icon-drawn {
+  stroke-dasharray: 2.2 2.8;
+  transform-origin: center;
+  animation: potIconForm .5s cubic-bezier(.2, .9, .3, 1) both;
+  /* Same 2-value shape as the resting dasharray on purpose — browsers only
+     interpolate stroke-dasharray smoothly between lists of equal length, so
+     hover has to reuse the pair rather than jump to a bare "0". */
+  transition: stroke-dasharray .32s cubic-bezier(.2, .9, .3, 1);
+}
+/* The broken, hand-drawn line is the resting state; hovering asks "what
+   does this look like finished?" — the dashes join into one continuous
+   stroke (a huge dash, zero gap) rather than replaying the entrance, and
+   un-hovering eases straight back to broken since this is a transition, not
+   a keyframe replay.
+
+   Triggered by hovering the *containing* link or button, not just the icon's
+   own (small) hit box — every one of these icons sits inside a `.pot-row`
+   nav link or a `.pot-icon-btn`/`.pot-chip-btn`/`.pot-solid-btn`/
+   `.pot-disclosure`/`.pot-popover-item` button, and hovering anywhere in
+   that row is what should read as "hovering this icon". The bare
+   `:hover` self-selector stays too, for the handful of places (e.g. Usage's
+   decorative stat icons) with no clickable ancestor at all. */
+.pot-icon-drawn:hover,
+a:hover .pot-icon-drawn,
+button:hover .pot-icon-drawn {
+  stroke-dasharray: 48 0;
+}
+
+/* ---- Usage page animations ---- */
+
+.pot-fade-up {
+  animation: potFadeUp .5s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+/* Stagger direct children's fade-up entrance. Apply to a grid/flex container
+   whose children each carry .pot-fade-up — nth-child overrides the base
+   delay so items cascade in from first to last. */
+.pot-stagger > .pot-fade-up:nth-child(1) { animation-delay: 0s; }
+.pot-stagger > .pot-fade-up:nth-child(2) { animation-delay: .07s; }
+.pot-stagger > .pot-fade-up:nth-child(3) { animation-delay: .14s; }
+.pot-stagger > .pot-fade-up:nth-child(4) { animation-delay: .21s; }
+.pot-stagger > .pot-fade-up:nth-child(5) { animation-delay: .28s; }
+.pot-stagger > .pot-fade-up:nth-child(6) { animation-delay: .35s; }
+.pot-stagger > .pot-fade-up:nth-child(7) { animation-delay: .42s; }
+.pot-stagger > .pot-fade-up:nth-child(8) { animation-delay: .49s; }
+
+@keyframes potBarGrow {
+  from { transform: scaleY(0); opacity: 0; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+.pot-bar-grow {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: potBarGrow .6s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes potDonutDraw {
+  from { stroke-dashoffset: var(--pot-arc-len); }
+  to { stroke-dashoffset: 0; }
+}
+.pot-donut-draw {
+  animation: potDonutDraw .8s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes potTableRowIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: none; }
+}
+.pot-table-row-in {
+  animation: potTableRowIn .35s cubic-bezier(.22, 1, .36, 1) both;
+}
+.pot-table-row-in:nth-child(1) { animation-delay: 0s; }
+.pot-table-row-in:nth-child(2) { animation-delay: .04s; }
+.pot-table-row-in:nth-child(3) { animation-delay: .08s; }
+.pot-table-row-in:nth-child(4) { animation-delay: .12s; }
+.pot-table-row-in:nth-child(5) { animation-delay: .16s; }
+.pot-table-row-in:nth-child(6) { animation-delay: .20s; }
+.pot-table-row-in:nth-child(7) { animation-delay: .24s; }
+.pot-table-row-in:nth-child(8) { animation-delay: .28s; }
+.pot-table-row-in:nth-child(9) { animation-delay: .32s; }
+.pot-table-row-in:nth-child(10) { animation-delay: .36s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Shell primitives. The prototype expresses these as inline styles plus a
+ * style-hover attribute its canvas runtime understands; real CSS classes are
+ * the equivalent here, and keep the hover/focus states out of the JSX.
+ * ------------------------------------------------------------------------- */
+
+/* Consistent keyboard focus ring across buttons, links, and other controls.
+   Inputs and custom sliders already signal focus with border-color, so they
+   keep their own treatment and skip the global ring. */
+:focus-visible {
+  outline: 2px solid var(--pot-accent-dot);
+  outline-offset: 2px;
+}
+input:focus-visible,
+textarea:focus-visible,
+[role="slider"]:focus-visible {
+  outline: none;
+}
+
+/* Film-grain drift — used by the progress-bar glow (see `.pot-progress-*`). */
+@keyframes potGrainShift {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-4%, 3%); }
+  40% { transform: translate(3%, -4%); }
+  60% { transform: translate(-3%, -2%); }
+  80% { transform: translate(4%, 2%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* The Button component's primary/potato variants — a flat gold fill that just
+   brightens on hover. */
+.pot-btn--gold {
+  background: var(--pot-gold-bg);
+  color: var(--pot-gold-fg);
+  border: 1px solid var(--pot-gold-edge);
+  transition: background .16s ease, border-color .16s ease;
+}
+.pot-btn--gold:hover:not(:disabled) {
+  background: var(--pot-gold-hover-bg);
+  border-color: var(--pot-gold-hover-bg);
+}
+
+.pot-icon-btn {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--pot-line-strong);
+  background: var(--pot-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--pot-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pot-sub);
+  transition: background .18s ease, color .18s ease, border-color .18s ease, transform .3s ease;
+}
+.pot-icon-btn:hover:not(:disabled) {
+  background: var(--pot-gold-bg);
+  color: var(--pot-gold-fg);
+  border-color: var(--pot-gold-edge);
+}
+.pot-icon-btn:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.pot-chip-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 11px;
+  border: 1px solid var(--pot-line-strong);
+  background: var(--pot-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--pot-ink-soft);
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.pot-chip-btn:hover:not(:disabled) {
+  background: var(--pot-accent-soft);
+  border-color: var(--pot-accent-edge);
+  transform: translateY(-1px);
+}
+.pot-chip-btn:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.pot-solid-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid var(--pot-inv-bg);
+  background: var(--pot-inv-bg);
+  color: var(--pot-inv-fg);
+  font-size: 11.5px;
+  font-weight: 700;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.pot-solid-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Lorenz-idle hover prompt — ported from lorentzhover/style.css (Uiverse.io,
+   by Galahhad): a dark pill whose label scrambles into the accent color on
+   hover. Colors swapped for the app's own theme tokens; the glitch keyframes
+   are unchanged. */
+.pot-lorenz-btn {
+  box-sizing: border-box;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pot-inv-fg);
+  font: 700 12.5px var(--pot-mono);
+  background: var(--pot-inv-bg);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .3s;
+  overflow: hidden;
+  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, .25);
+}
+.pot-lorenz-btn span {
+  letter-spacing: .1rem;
+  transition: color .3s;
+  box-sizing: border-box;
+  position: relative;
+  background: inherit;
+  white-space: nowrap;
+}
+.pot-lorenz-btn span::before {
+  box-sizing: border-box;
+  position: absolute;
+  content: "";
+  background: inherit;
+}
+/* Hover stays strictly black-and-white in both themes — the label used to
+   scramble into the accent colour with a 1.2s glitch animation on
+   span::before; that animation is deliberately gone, and the accent tint
+   with it. --pot-inv-* is already near-black-on-white (light) / near-white-
+   on-black (dark), so a small lightening of the pill is the whole hover. */
+.pot-lorenz-btn:hover,
+.pot-lorenz-btn:focus-visible {
+  background: color-mix(in srgb, var(--pot-inv-bg) 88%, var(--pot-inv-fg) 12%);
+}
+
+/* Sidebar row — nav link or conversation. */
+.pot-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 8px 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: background .16s ease;
+}
+.pot-row:hover {
+  background: var(--pot-hover);
+}
+.pot-row[data-active="true"] {
+  background: var(--pot-raised);
+  box-shadow: inset 2px 0 0 var(--pot-accent-dot);
+}
+
+.pot-row-menu {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border: 0;
+  background: transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--pot-ghost);
+  font-family: var(--pot-mono);
+  font-size: 11px;
+  opacity: 0;
+  transition: background .16s ease, color .16s ease, opacity .16s ease;
+}
+.pot-row:hover .pot-row-menu,
+.pot-row-menu:focus-visible {
+  opacity: 1;
+}
+.pot-row-menu:hover {
+  background: var(--pot-raised);
+  color: var(--pot-ink);
+}
+
+.pot-search {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--pot-line-strong);
+  border-radius: 8px;
+  background: var(--pot-bg);
+  transition: border-color .18s ease;
+}
+.pot-search:focus-within {
+  border-color: var(--pot-accent-edge);
+}
+
+.pot-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-top: 1px solid var(--pot-line);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.pot-menu-item:hover:not(:disabled) {
+  background: var(--pot-accent-soft);
+}
+.pot-menu-item[data-selected="true"] {
+  background: var(--pot-accent-soft);
+}
+
+.pot-textarea {
+  width: 100%;
+  resize: none;
+  border: 1px solid var(--pot-line-strong);
+  border-radius: 10px;
+  padding: 11px 12px;
+  font-family: var(--pot-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--pot-ink);
+  background: var(--pot-field);
+  transition: border-color .18s ease, background .18s ease;
+}
+.pot-textarea:focus {
+  outline: none;
+  border-color: var(--pot-accent-edge);
+  background: var(--pot-bg);
+}
+
+/* Drag-to-resize edge for the sidebar and the live monitor (see
+   useResizableWidth). A slim hit target rather than a visible bar at rest —
+   it only shows as a hairline on hover/drag, so it doesn't read as a second
+   border next to the panel's real one. */
+.pot-resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: ew-resize;
+  z-index: 3;
+  touch-action: none;
+}
+.pot-resize-handle::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 2px;
+  width: 2px;
+  background: transparent;
+  transition: background .14s ease;
+}
+.pot-resize-handle:hover::after {
+  background: var(--pot-accent-edge);
+}
+
+.pot-section-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  color: var(--pot-sub);
+}
+
+/* Disclosure header for the collapsible WORKSPACE / TOOLS groups. */
+.pot-disclosure {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background .16s ease;
+}
+.pot-disclosure:hover {
+  background: var(--pot-hover);
+}
+.pot-disclosure-caret {
+  flex: 0 0 12px;
+  color: var(--pot-faint);
+  transition: transform .24s cubic-bezier(.2, .9, .3, 1);
+}
+.pot-disclosure[aria-expanded="true"] .pot-disclosure-caret {
+  transform: rotate(90deg);
+}
+
+/* Floating popover: the row "···" menu and the chat filter menu. */
+.pot-popover {
+  position: fixed;
+  z-index: 60;
+  min-width: 176px;
+  padding: 5px;
+  background: var(--pot-bg);
+  border: 1px solid var(--pot-line-strong);
+  border-radius: 10px;
+  box-shadow: 0 18px 40px -14px rgba(0, 0, 0, .4);
+  animation: potMenuIn .16s cubic-bezier(.2, .9, .3, 1) both;
+}
+
+.pot-popover-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--pot-ink-soft);
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+  transition: background .14s ease, color .14s ease;
+}
+.pot-popover-item:hover {
+  background: var(--pot-accent-soft);
+  color: var(--pot-ink);
+}
+.pot-popover-item[data-danger="true"]:hover {
+  background: color-mix(in srgb, var(--pot-danger) 14%, transparent);
+  color: var(--pot-danger);
+}
+.pot-popover-item-glyph {
+  display: grid;
+  place-items: center;
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  color: var(--pot-faint);
+}
+.pot-popover-item:hover .pot-popover-item-glyph {
+  color: inherit;
+}
+
+.pot-popover-label {
+  padding: 7px 9px 4px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--pot-faint);
+}
+
+.pot-popover-sep {
+  height: 1px;
+  margin: 4px 5px;
+  background: var(--pot-line);
+}
+
+/* A labeled control row inside a popover (the appearance menu's Mode / Font
+   Size / UI Size rows) — .pot-popover-label plus one control, instead of a
+   .pot-popover-item per option (three rows per setting reads as a much
+   longer menu than three buttons in one row do). */
+.pot-popover-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px 9px 8px;
+}
+
+.pot-segmented {
+  display: flex;
+  gap: 3px;
+  padding: 2px;
+  border: 1px solid var(--pot-line);
+  border-radius: 7px;
+  background: var(--pot-bg);
+}
+.pot-segmented-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  height: 22px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--pot-sub);
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .14s ease, color .14s ease;
+}
+.pot-segmented-btn:hover:not(:disabled) {
+  background: var(--pot-hover);
+  color: var(--pot-ink);
+}
+.pot-segmented-btn[data-active="true"] {
+  background: var(--pot-accent-soft);
+  color: var(--pot-accent-ink);
+}
+.pot-segmented-btn:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+/* Search field that slides open under the CHATS heading. */
+.pot-collapsible {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows .26s cubic-bezier(.4, 0, .2, 1), opacity .2s ease;
+}
+.pot-collapsible[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.pot-collapsible > * {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* The New chat action leading the WORKSPACE group — the one thing the
+   Playground is for, so it is deliberately the largest target in the rail. */
+.pot-row[data-new-chat="true"] {
+  color: var(--pot-ink);
+  border: 1px dashed var(--pot-line-strong);
+  margin-bottom: 6px;
+  padding: 11px 12px;
+  border-radius: 9px;
+}
+.pot-row[data-new-chat="true"]:hover {
+  background: var(--pot-accent-soft);
+  border-color: var(--pot-accent-edge);
+}
+
+/* Potato "(_)" glyph: at rest the parentheses drift apart and the underscore
+   is faint; hovering the parent row snaps the pieces together into one solid
+   mark. The transition is on the child spans so the motion follows the cursor
+   into the whole row, not just the glyph itself. */
+.pot-potato-glyph {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--pot-mono);
+}
+.pot-potato-glyph-paren,
+.pot-potato-glyph-underscore {
+  display: inline-block;
+  transition: transform .25s cubic-bezier(.2, .9, .3, 1), opacity .25s ease;
+}
+.pot-potato-glyph-paren-left {
+  transform: translateX(2px);
+}
+.pot-potato-glyph-paren-right {
+  transform: translateX(-2px);
+}
+.pot-potato-glyph-underscore {
+  opacity: .55;
+  transform: scaleX(.85);
+}
+.pot-potato-row:hover .pot-potato-glyph-paren-left,
+.pot-potato-row:focus-visible .pot-potato-glyph-paren-left {
+  transform: translateX(0);
+}
+.pot-potato-row:hover .pot-potato-glyph-paren-right,
+.pot-potato-row:focus-visible .pot-potato-glyph-paren-right {
+  transform: translateX(0);
+}
+.pot-potato-row:hover .pot-potato-glyph-underscore,
+.pot-potato-row:focus-visible .pot-potato-glyph-underscore {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* ---- Tags / status labels -------------------------------------------------
+   The app's one tag treatment, replacing the old rounded pills with a 14%
+   colour-tint fill (Badge component, nav Beta chip, model/pack labels, …).
+   The look is a machined index label: no fill, a hairline border in the
+   label's own full-strength colour, one corner clipped at 45°, a 3px filled
+   tick ahead of monospace all-caps text. Tone is set with `data-tone`. */
+.pot-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 17px;
+  padding: 0 6px 0 6px;
+  font-family: var(--pot-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--pot-tag-ink, var(--pot-ink-soft));
+  background: transparent;
+  border: 1px solid var(--pot-tag-edge, var(--pot-line-strong));
+  border-radius: 0;
+  clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%);
+}
+.pot-tag::before {
+  content: "";
+  width: 3px;
+  height: 3px;
+  flex: 0 0 3px;
+  background: var(--pot-tag-edge, var(--pot-line-strong));
+}
+.pot-tag[data-tone="accent"],
+.pot-tag[data-tone="potato"] { --pot-tag-ink: var(--pot-accent-ink); --pot-tag-edge: var(--pot-accent-dot); }
+.pot-tag[data-tone="success"] { --pot-tag-ink: var(--pot-ok); --pot-tag-edge: var(--pot-ok); }
+.pot-tag[data-tone="warning"] { --pot-tag-ink: var(--pot-accent-dot); --pot-tag-edge: var(--pot-accent-dot); }
+.pot-tag[data-tone="danger"] { --pot-tag-ink: var(--pot-danger); --pot-tag-edge: var(--pot-danger); }
+
+/* Beta marker on nav rows — the same machined label, accent-toned. */
+.pot-beta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 16px;
+  padding: 0 5px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--pot-accent-ink);
+  border: 1px solid var(--pot-accent-dot);
+  font-family: var(--pot-mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 0 100%);
+}
+
+/* ---- Progress bars -------------------------------------------------------
+   Takes its cue from the Live Monitor's sliders (controls.tsx's DashTrack):
+   a bracketed, dashed track rather than a solid rounded pill, with a thin
+   head marker at the fill edge. `--pot-progress-tone` sets the colour. */
+.pot-progress {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  /* room for the fill's glow / head bloom to breathe above and below */
+  padding-block: 4px;
+  font-family: var(--pot-mono);
+}
+.pot-progress-bracket {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pot-ghost);
+  line-height: 1;
+}
+.pot-progress-track {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 12px;
+  display: flex;
+  align-items: stretch;
+  /* no overflow clip here — the fill's outer glow needs to bleed past the
+     track edge. The fill clips its own sheen/grain internally. */
+  background-image: repeating-linear-gradient(90deg, var(--pot-ghost) 0 2px, transparent 2px 7px);
+}
+.pot-progress-fill {
+  position: relative;
+  flex: 0 0 auto;
+  overflow: hidden;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--pot-progress-tone, var(--pot-progress-accent)) 0 2px,
+    transparent 2px 7px
+  );
+  box-shadow:
+    0 0 3px -1px color-mix(in srgb, var(--pot-progress-tone, var(--pot-progress-accent)) 45%, transparent),
+    inset 0 0 2px color-mix(in srgb, var(--pot-progress-tone, var(--pot-progress-accent)) 22%, transparent);
+  transition: width .3s var(--ease-standard, cubic-bezier(.4, 0, .2, 1));
+}
+/* Windows-7-style travelling highlight: a soft band with a bright core and a
+   fading tail that sweeps the filled region, blended additively. It's a
+   fixed-width block translated across, so it always enters from fully off the
+   left edge and leaves fully off the right, then pauses before repeating. */
+.pot-progress-fill::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 55%;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--pot-progress-tone, var(--pot-progress-accent)) 30%, transparent) 34%,
+    color-mix(in srgb, var(--pot-progress-tone, var(--pot-progress-accent)) 70%, #fff) 64%,
+    rgba(255, 255, 255, 0.6) 76%,
+    color-mix(in srgb, var(--pot-progress-tone, var(--pot-progress-accent)) 55%, #fff) 84%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  transform: translateX(-110%);
+  animation: potProgressSheen 2.4s linear infinite;
+}
+/* Film grain riding on the glow. */
+.pot-progress-fill::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background-image: var(--pot-grain);
+  background-size: 90px 90px;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  animation: potGrainShift 0.5s steps(3, end) infinite;
+}
+@keyframes potProgressSheen {
+  0% { transform: translateX(-110%); }
+  55% { transform: translateX(210%); }
+  100% { transform: translateX(210%); }
+}
+.pot-progress-head {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--pot-progress-tone, var(--pot-progress-accent));
+  box-shadow:
+    0 0 5px 0 color-mix(in srgb, var(--pot-progress-tone, var(--pot-progress-accent)) 55%, transparent),
+    0 0 2px 0 rgba(255, 255, 255, 0.35);
+  transition: left .3s var(--ease-standard, cubic-bezier(.4, 0, .2, 1));
+}

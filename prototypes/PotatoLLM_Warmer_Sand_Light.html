@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PotatoLLM — Warm Light Theme</title>
+<style>
+  :root{
+    --page:#f3e8d4;
+    --page-2:#f9f0df;
+    --sidebar:#f6efe1;
+    --surface:#fff8ed;
+    --surface-soft:#fbf2df;
+    --border:#e8dcc6;
+    --border-strong:#dfcba8;
+    --gold:#d8a43d;
+    --gold-light:#f5e2b5;
+    --gold-bg:#fff0cf;
+    --text:#2d2923;
+    --muted:#81796c;
+    --muted-2:#a69d8f;
+    --shadow:0 8px 30px rgba(112,82,35,.07);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    height:100vh;
+    overflow:hidden;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    color:var(--text);
+    background:var(--page);
+    font-size:13px;
+  }
+
+  button{font:inherit;color:inherit}
+  .app{display:grid;grid-template-columns:318px 1fr;height:100vh}
+
+  /* Sidebar */
+  .sidebar{
+    background:var(--sidebar);
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+  }
+  .brandbar{
+    height:72px;
+    padding:0 24px;
+    display:flex;
+    align-items:center;
+    gap:11px;
+    border-bottom:1px solid var(--border);
+  }
+  .brand-icon{
+    width:32px;height:32px;border-radius:9px;
+    background:#1d1b17;color:#f5c34e;
+    display:grid;place-items:center;
+    font-weight:800;font-size:17px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+  }
+  .brand{font-weight:750;font-size:17px;letter-spacing:-.3px}
+  .version{
+    padding:3px 6px;border:1px solid var(--border-strong);
+    background:#fff9ec;border-radius:5px;
+    color:#9c7839;font-size:10px;font-weight:700;
+  }
+  .collapse{
+    margin-left:auto;width:32px;height:32px;
+    border:1px solid var(--border);background:#fffaf1;
+    border-radius:9px;font-weight:700;cursor:pointer;
+  }
+  .side-content{padding:18px 20px;overflow:hidden;flex:1}
+  .new-chat{
+    width:100%;height:42px;text-align:left;
+    border:1px solid #e7bf6c;border-radius:9px;
+    background:linear-gradient(90deg,#fff2d2,#ffedc4);
+    font-weight:700;padding:0 15px;cursor:pointer;
+  }
+  .new-chat span{color:#b88322;margin-right:9px}
+  .section{margin-top:25px}
+  .section-title{
+    display:flex;align-items:center;gap:9px;
+    color:#71695d;font-size:10px;font-weight:800;
+    letter-spacing:1.2px;text-transform:uppercase;
+    margin-bottom:11px;
+  }
+  .section-title:after{
+    content:"";height:1px;flex:1;
+    border-top:1px dashed #d8ccb7;
+  }
+  .section-title .count{margin-left:auto;color:#8b8274}
+  .nav-item{
+    height:34px;display:flex;align-items:center;gap:11px;
+    padding:0 9px;border-radius:7px;font-weight:600;
+    cursor:pointer;
+  }
+  .nav-item:hover{background:#f3ead9}
+  .nav-icon{width:15px;text-align:center;color:#6f685d}
+  .chat-tools{display:flex;gap:7px;margin-left:auto}
+  .mini{
+    width:27px;height:27px;border:1px solid var(--border);
+    background:#fffaf1;border-radius:7px;display:grid;place-items:center;
+  }
+  .chat-list{display:flex;flex-direction:column;gap:1px}
+  .chat{
+    height:31px;display:flex;align-items:center;gap:9px;
+    padding:0 9px;border-radius:7px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .chat:before{content:"";width:4px;height:4px;background:#b7ac9b;border-radius:50%;flex:none}
+  .chat.active{
+    background:linear-gradient(90deg,#fff0cd,#ffefda);
+    border-left:2px solid #e0ad43;padding-left:7px;font-weight:700;
+  }
+  .chat.active:before{background:#d7a13a}
+  .chat span{overflow:hidden;text-overflow:ellipsis}
+  .account{
+    margin:0 12px 14px;padding:13px 12px 10px;
+    border:1px solid var(--border);border-radius:12px;
+    background:#fff9ee;box-shadow:var(--shadow);
+  }
+  .account-top{display:flex;align-items:center;gap:10px}
+  .avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:#f3bd45;color:white;display:grid;place-items:center;
+    font-weight:800;
+  }
+  .account-name{font-weight:750}
+  .gpu{font-size:10px;color:var(--muted);margin-top:2px}
+  .settings{margin-left:auto;border:1px solid var(--border);background:#fffaf1;width:28px;height:28px;border-radius:8px}
+  .usage{
+    margin-top:11px;border:1px solid var(--border);
+    background:#fffdf8;border-radius:8px;height:37px;
+    display:flex;align-items:center;padding:0 10px;
+    font-size:10px;font-weight:800;letter-spacing:.8px;
+  }
+  .usage strong{margin-left:auto;font-size:12px;letter-spacing:0}
+  .usage b{font-size:16px;margin-left:7px;color:#8f8475}
+
+  /* Main */
+  .main{min-width:0;display:flex;flex-direction:column;background:var(--page)}
+  .topbar{
+    height:72px;background:rgba(250,241,224,.88);
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;padding:0 26px;
+  }
+  .title{font-weight:800;font-size:15px}
+  .tokens{color:var(--muted-2);font-size:11px;margin-left:13px}
+  .top-actions{margin-left:auto;display:flex;gap:9px}
+  .top-btn{
+    height:34px;padding:0 13px;border:1px solid var(--border);
+    border-radius:9px;background:#fffaf1;font-weight:650;
+  }
+  .top-btn.dark{background:#28251f;color:white;border-color:#28251f}
+
+  .chat-area{
+    flex:1;position:relative;display:flex;justify-content:center;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 52% 40%,rgba(255,244,213,.88) 0,rgba(249,235,210,.78) 32%,rgba(243,232,212,.96) 72%),
+      linear-gradient(135deg,#f4e7d1,#eee0c9);
+  }
+  .empty{
+    position:absolute;top:23%;text-align:center;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .logo-art{
+    width:330px;height:235px;position:relative;margin-bottom:18px;
+    opacity:.9;
+  }
+  .ring{
+    position:absolute;border:3px dotted rgba(216,164,61,.58);
+    border-radius:48% 52% 47% 53%;
+    transform:rotate(-9deg);
+  }
+  .ring.one{width:170px;height:155px;left:53px;top:40px}
+  .ring.two{width:175px;height:160px;left:135px;top:39px;transform:rotate(10deg);border-color:rgba(201,191,172,.72)}
+  .logo-art:before,.logo-art:after{
+    content:"";position:absolute;border-radius:50%;
+    border:2px dotted rgba(216,164,61,.38);
+  }
+  .logo-art:before{width:120px;height:95px;left:90px;top:65px}
+  .logo-art:after{width:105px;height:84px;left:144px;top:66px;border-color:rgba(198,187,167,.6)}
+  .empty h1{font-size:18px;margin:0 0 8px;letter-spacing:-.2px}
+  .empty p{margin:0;color:#81786b;font-size:12px}
+
+  .composer{
+    position:absolute;bottom:22px;width:min(808px,68%);
+    min-height:120px;border:1px solid var(--border);
+    background:rgba(255,251,243,.92);border-radius:15px;
+    box-shadow:0 10px 35px rgba(104,76,31,.09);
+    padding:16px 16px 13px;
+  }
+  .placeholder{color:#a79b8b;font-size:14px}
+  .composer-bottom{display:flex;align-items:center;margin-top:47px}
+  .attach{
+    width:34px;height:34px;border:1px solid var(--border);
+    background:#fffaf1;border-radius:9px;font-size:20px;
+  }
+  .hint{font-size:11px;color:#958b7e;margin-left:12px}
+  .model-select{
+    margin-left:auto;height:36px;border:1px solid var(--border-strong);
+    background:#fffaf1;border-radius:9px;padding:0 12px;font-weight:700;
+  }
+  .send{
+    width:37px;height:37px;margin-left:8px;border:1px solid #f0d9a6;
+    background:#fff1cf;color:#d8a43d;border-radius:9px;font-weight:900;
+  }
+
+  .status{
+    height:40px;border-top:1px solid var(--border);
+    background:#f1e5d0;display:flex;align-items:center;
+    padding:0 20px;color:#8d8477;font-size:10px;
+  }
+  .status strong{color:#29261f;font-size:11px}
+  .dot{width:7px;height:7px;background:#d5b16c;border-radius:50%;margin-right:9px}
+  .divider{height:15px;width:1px;background:#dfd2be;margin:0 13px}
+  .meter{width:70px;height:2px;background:#e2b24b;margin:0 13px}
+  .right-status{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .monitor{
+    height:30px;padding:0 12px;border:1px solid var(--border);
+    border-radius:9px;background:#fffaf1;font-weight:750;
+  }
+  .monitor i{display:inline-block;width:6px;height:6px;background:#e2b24b;border-radius:50%;margin-left:5px}
+
+  @media(max-width:900px){
+    .app{grid-template-columns:245px 1fr}
+    .composer{width:78%}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandbar">
+      <div class="brand-icon">⌁</div>
+      <div class="brand">PotatoLLM</div>
+      <div class="version">v0.1</div>
+      <button class="collapse">«</button>
+    </div>
+
+    <div class="side-content">
+      <button class="new-chat"><span>＋</span> New chat</button>
+
+      <section class="section">
+        <div class="section-title">Workspace <span class="count">4</span></div>
+        <div class="nav-item"><span class="nav-icon">▧</span>Playground</div>
+        <div class="nav-item"><span class="nav-icon">▦</span>Dashboard</div>
+        <div class="nav-item"><span class="nav-icon">▤</span>Model Library</div>
+        <div class="nav-item"><span class="nav-icon">ϟ</span>Optimize</div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          Chats <span class="count">14</span>
+          <div class="chat-tools"><button class="mini">⌕</button><button class="mini">▽</button></div>
+        </div>
+        <div class="chat-list">
+          <div class="chat active"><span>New chat</span></div>
+          <div class="chat"><span>New chat</span></div>
+          <div class="chat"><span>solve question in the attached sc...</span></div>
+          <div class="chat"><span>solve this question</span></div>
+          <div class="chat"><span>solve this question</span></div>
+          <div class="chat"><span>New chat</span></div>
+          <div class="chat"><span>solve this question</span></div>
+          <div class="chat"><span>solve this problem</span></div>
+          <div class="chat"><span>what is 2+2</span></div>
+          <div class="chat"><span>hello</span></div>
+          <div class="chat"><span>give me huge detail for this with ...</span></div>
+          <div class="chat"><span>New chat</span></div>
+          <div class="chat"><span>New chat</span></div>
+          <div class="chat"><span>what is lorentz transform</span></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">Tools <span class="count">3</span></div>
+        <div class="nav-item"><span class="nav-icon">⬡</span>Build History</div>
+        <div class="nav-item"><span class="nav-icon">▤</span>Storage</div>
+        <div class="nav-item"><span class="nav-icon">↓</span>Downloads</div>
+      </section>
+    </div>
+
+    <div class="account">
+      <div class="account-top">
+        <div class="avatar">Y</div>
+        <div><div class="account-name">Your Potato</div><div class="gpu">NVIDIA GeForce RTX 5060</div></div>
+        <button class="settings">⚙</button>
+      </div>
+      <div class="usage">USAGE <strong>0 tok today</strong><b>›</b></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="title">New chat</div>
+      <div class="tokens">0 tokens</div>
+      <div class="top-actions">
+        <button class="top-btn">◔</button>
+        <button class="top-btn">♧ Feedback</button>
+        <button class="top-btn dark">〉_ Logs</button>
+      </div>
+    </header>
+
+    <section class="chat-area">
+      <div class="empty">
+        <div class="logo-art"><div class="ring one"></div><div class="ring two"></div></div>
+        <h1>Load a model to start chatting</h1>
+        <p>Pick a downloaded model from the selector below the composer.</p>
+      </div>
+
+      <div class="composer">
+        <div class="placeholder">Load a model first</div>
+        <div class="composer-bottom">
+          <button class="attach">+</button>
+          <span class="hint">Shift + Enter for a newline</span>
+          <button class="model-select">Select model　⌄</button>
+          <button class="send">➜</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="status">
+      <span class="dot"></span><strong>NO MODEL</strong>
+      <span class="divider"></span><span>no model loaded</span>
+      <span class="meter"></span><span>0.0 tok/s</span>
+      <div class="right-status">
+        <span>CPU 2%</span><span>ctx --</span><span>t = 0.0s</span>
+        <button class="monitor">LIVE MONITOR <i></i></button>
+      </div>
+    </footer>
+  </main>
+</div>
+</body>
+</html>
